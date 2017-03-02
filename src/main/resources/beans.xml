@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:http="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+
+    <bean id="knight" class="com.gmail.lizaiatsenko.Knight" scope="prototype">
+        <property name="quest" ref="quest"/>
+        <property name="name" value="Liza"/>
+        <!--<constructor-arg ref="quest"/>-->
+    </bean>
+
+    <bean id="quest" class="com.gmail.lizaiatsenko.Quest"/>
+    <bean id="mistrel" class="com.gmail.lizaiatsenko.Mistrel"/>
+    <bean id="mag" class="com.gmail.lizaiatsenko.Mago">
+        <property name="magicBox" ref="magicBox"/>
+        <property name="magicWords" value="fokus pokus"/>
+    </bean>
+    <bean id="magicBox" class="com.gmail.lizaiatsenko.MagicBox">
+        <replaced-method name="getContents" replacer="tigerReplacer"/>
+    </bean>
+    <bean id="tigerReplacer" class="com.gmail.lizaiatsenko.TigerReplacer"/>
+
+    <bean id="magician" class="com.gmail.lizaiatsenko.Magician"/>
+    <bean id="volonteer" class="com.gmail.lizaiatsenko.Volonteer">
+        <property name="name" value="#{knight.name}"/>
+
+    </bean>
+
+    <aop:config>
+        <aop:aspect ref="mistrel">
+            <aop:pointcut id="embark" expression="execution(* *.embarkOnQuest(..))"/>
+            <aop:before pointcut-ref="embark" method="SingBeforeQuest"/>
+            <aop:after pointcut-ref="embark" method="SingAfterQuest"/>
+        </aop:aspect>
+
+        <aop:aspect ref="magician">
+            <aop:pointcut id="thinking"
+                          expression="execution(*com.gmail.lizaiatsenko.Thinker.thinkOfSomething(String)(thoughts))"/>
+
+                    <aop:before pointcut-ref="thinking"
+                                method="intersepthoughts"
+                                arg-names="thoughts"/>
+        </aop:aspect>
+
+
+    </aop:config>
+</beans>
